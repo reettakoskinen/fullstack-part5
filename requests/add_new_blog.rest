@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJlZXR0YSIsImlkIjoiNjVjYjI0ZGZkZjY0ZjIwMjk3YzU1MDIxIiwiaWF0IjoxNzA3ODEzNDYwfQ.6yQpEy9t5NzE-jgjVzn53tspJBKPNXcfmF_C_OSpNJ8
+
+{
+  "title": "testi4",
+  "author": "reetta",
+  "url": "www.testiblog4.fi",
+  "likes": 864
+}
