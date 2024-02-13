@@ -1,24 +1,14 @@
 const bcrypt = require('bcrypt')
-const usersRouter = require('express').Router()
+const router = require('express').Router()
 const User = require('../models/user')
 
-usersRouter.post('/', async (request, response) => {
+router.post('/', async (request, response) => {
   const { username, name, password } = request.body
 
-  // Check if both username and password are provided
-  if (!username || !password) {
-    return response.status(400).json({ error: 'Username and password are required' })
-  }
-
-  // Check if username and password are at least 3 characters long
-  if (username.length < 3 || password.length < 3) {
-    return response.status(400).json({ error: 'Username and password must be at least 3 characters long' })
-  }
-
-  // Check if the username is unique
-  const existingUser = await User.findOne({ username: username })
-  if (existingUser) {
-    return response.status(400).json({ error: 'Username must be unique' })
+  if ( !password || password.length < 3) {
+    return response.status(400).json({
+      error: '`password` is shorter than the minimum allowed length (3)'
+    })
   }
 
   const saltRounds = 10
@@ -35,10 +25,11 @@ usersRouter.post('/', async (request, response) => {
   response.status(201).json(savedUser)
 })
 
-usersRouter.get('/', async (request, response) => {
-    const users = await User
-    .find({}).populate('blogs', { url: 1, title: 1 , author: 1})
-    response.json(users)
-  })
+router.get('/', async (request, response) => {
+  const users = await User.find({})
+    .populate('blogs', { title: 1, author: 1, url: 1, likes: 1 })
 
-module.exports = usersRouter
+  response.json(users)
+})
+
+module.exports = router
