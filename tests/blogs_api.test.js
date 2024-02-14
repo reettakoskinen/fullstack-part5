@@ -17,7 +17,7 @@ describe('blogs api', () => {
     // create a test user and save the corresponding auth header
     const user = initialUsers[0]
     await api.post('/api/users').send(user)
-    const response = await api.post('/api/login').send(user)   
+    const response = await api.post('/api/login').send(user)
     authHeader = `Bearer ${response.body.token}`
   })
 
@@ -32,7 +32,7 @@ describe('blogs api', () => {
         .get('/api/blogs')
         .expect(200)
         .expect('Content-Type', /application\/json/)
-    
+
       expect(response.body).toHaveLength(initialBlogs.length)
     })
 
@@ -41,7 +41,7 @@ describe('blogs api', () => {
         .get('/api/blogs')
         .expect(200)
         .expect('Content-Type', /application\/json/)
-    
+
       const blog = response.body[0]
 
       expect(blog.id).toBeDefined()
@@ -50,17 +50,17 @@ describe('blogs api', () => {
     test('a blog can be edited', async () => {
       const [blogBefore] = await blogsInDb()
 
-      const modifiedBlog = {...blogBefore, title: 'Goto considered useful'}
+      const modifiedBlog = { ...blogBefore, title: 'Goto considered useful' }
 
       await api
         .put(`/api/blogs/${blogBefore.id}`)
         .send(modifiedBlog)
         .expect(200)
-    
+
       const blogs = await blogsInDb()
 
       const titles = blogs.map(r => r.title)
-    
+
       expect(titles).toContain(
         modifiedBlog.title
       )
@@ -69,25 +69,25 @@ describe('blogs api', () => {
     describe('a new blog', () => {
       test('can be added', async () => {
         const blog = {
-          title: "Go To Statement Considered Harmful",
-          author: "Edsger W. Dijkstra",
-          url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+          title: 'Go To Statement Considered Harmful',
+          author: 'Edsger W. Dijkstra',
+          url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
           likes: 5,
         }
-      
+
         await api
           .post('/api/blogs')
           .set('Authorization', authHeader)
           .send(blog)
           .expect(201)
           .expect('Content-Type', /application\/json/)
-      
+
         const blogs = await blogsInDb()
-    
+
         expect(blogs).toHaveLength(initialBlogs.length+1)
-      
+
         const titles = blogs.map(r => r.title)
-    
+
         expect(titles).toContain(
           blog.title
         )
@@ -95,48 +95,48 @@ describe('blogs api', () => {
 
       test('has likes initialized to 0 if initial value is not given', async () => {
         const blog = {
-          title: "Go To Statement Considered Harmful",
-          author: "Edsger W. Dijkstra",
-          url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+          title: 'Go To Statement Considered Harmful',
+          author: 'Edsger W. Dijkstra',
+          url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
         }
-      
+
         const response = await api
           .post('/api/blogs')
           .set('Authorization', authHeader)
           .send(blog)
           .expect(201)
           .expect('Content-Type', /application\/json/)
-    
+
         expect(response.body.likes).toBe(0)
       })
 
       test('if title is missing, creation fails', async () => {
         const blog = {
-          author: "Edsger W. Dijkstra",
-          url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+          author: 'Edsger W. Dijkstra',
+          url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
         }
-      
+
         const response = await api
           .post('/api/blogs')
           .set('Authorization', authHeader)
           .send(blog)
           .expect(400)
           .expect('Content-Type', /application\/json/)
-      }) 
-      
+      })
+
       test('if author is missing, creation fails', async () => {
         const blog = {
-          title: "Go To Statement Considered Harmful",
-          url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+          title: 'Go To Statement Considered Harmful',
+          url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
         }
-      
+
         const response = await api
           .post('/api/blogs')
           .set('Authorization', authHeader)
           .send(blog)
           .expect(400)
           .expect('Content-Type', /application\/json/)
-      })   
+      })
     })
   })
 
@@ -146,12 +146,12 @@ describe('blogs api', () => {
       await Blog.deleteMany({})
 
       const blog = {
-        title: "React patterns",
-        author: "Michael Chan",
-        url: "https://reactpatterns.com/",
+        title: 'React patterns',
+        author: 'Michael Chan',
+        url: 'https://reactpatterns.com/',
         likes: 7,
       }
-    
+
       const response = await api
         .post('/api/blogs')
         .set('Authorization', authHeader)
@@ -167,7 +167,7 @@ describe('blogs api', () => {
         .delete(`/api/blogs/${id}`)
         .set('Authorization', authHeader)
         .expect(204)
-    
+
       const blogsAfter = await blogsInDb()
 
       expect(blogsAfter).toHaveLength(0)
@@ -179,7 +179,7 @@ describe('blogs api', () => {
       await api
         .delete(`/api/blogs/${id}`)
         .expect(401)
-    
+
       const blogsAfter = await blogsInDb()
 
       expect(blogsAfter).toHaveLength(1)
@@ -192,13 +192,13 @@ describe('blogs api', () => {
         username: 'mluukkai',
         password: 'secret'
       }
-    
+
       const response = await api
         .post('/api/users')
         .send(user)
         .expect(201)
         .expect('Content-Type', /application\/json/)
-    
+
       const users = await usersInDb()
 
       expect(users).toHaveLength(initialUsers.length + 1)
@@ -213,13 +213,13 @@ describe('blogs api', () => {
         username: 'ml',
         password: 'secret'
       }
-    
+
       const response = await api
         .post('/api/users')
         .send(user)
         .expect(400)
         .expect('Content-Type', /application\/json/)
-    
+
       expect(response.body.error).toContain(
         '`username` (`ml`) is shorter than the minimum allowed length (3)'
       )
@@ -230,13 +230,13 @@ describe('blogs api', () => {
         username: 'mluukka',
         password: 'se'
       }
-    
+
       const response = await api
         .post('/api/users')
         .send(user)
         .expect(400)
         .expect('Content-Type', /application\/json/)
-    
+
       expect(response.body.error).toContain(
         '`password` is shorter than the minimum allowed length (3)'
       )
@@ -244,17 +244,17 @@ describe('blogs api', () => {
 
     test('fails with a proper error if username not unique', async () => {
       const user = initialUsers[0]
-    
+
       const response = await api
         .post('/api/users')
         .send(user)
         .expect(400)
         .expect('Content-Type', /application\/json/)
-    
+
       expect(response.body.error).toContain(
         'expected `username` to be unique.'
       )
-    })  
+    })
   })
 
 })
