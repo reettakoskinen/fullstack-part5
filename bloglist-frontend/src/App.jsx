@@ -4,13 +4,14 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
 import CreateBlogForm from './components/CreateBlogForm'
+import LoginForm from './components/LoginForm'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [newBlog, setNewBlog] = useState({ title: '', author: '', url: '' })
   const [notification, setNotification] = useState({ message: null, type: 'success' })
   const [createBlogVisible, setCreateBlogVisible] = useState(false)
 
@@ -56,14 +57,13 @@ const App = () => {
     window.localStorage.clear()
   }
 
-  const handleCreateBlog = async (event) => {
-    event.preventDefault()
-
+  const addBlog = (blogObject) => {
     try {
-      const createdBlog = await blogService.create(newBlog)
-      setBlogs([...blogs, createdBlog])
-      setNewBlog({ title: '', author: '', url: '' })
-      setNotification({ message: `a new blog ${newBlog.title} by ${newBlog.author} added`, type: 'success' })
+      blogService.create(blogObject)
+        .then(returnedBlog => {
+          setBlogs(blogs.concat(returnedBlog))
+        })
+      setNotification({ message: `a new blog ${blogObject.title} by ${blogObject.author} added`, type: 'success' })
       setTimeout(() => {
         setNotification({ message: null, type: 'success' })
       }, 5000)
@@ -73,64 +73,24 @@ const App = () => {
     }
   }
 
-  const loginForm = () => {
-    return (
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    )
-  }
-
-  const createNewForm = () => {
-    const hideWhenVisible = { display: createBlogVisible ? 'none' : '' }
-    const showWhenVisible = { display: createBlogVisible ? '' : 'none' }
-
-    return (
-      <div>
-        <div style={hideWhenVisible}>
-          <button onClick={() => setCreateBlogVisible(true)}>new blog</button>
-        </div>
-        <div style={showWhenVisible}>
-          <h2>create new</h2>
-          <CreateBlogForm
-            title={newBlog.title}
-            author={newBlog.author}
-            url={newBlog.url}
-            handleTitle={({ target }) => setNewBlog({ ...newBlog, title: target.value })}
-            handleAuthor={({ target }) => setNewBlog({ ...newBlog, author: target.value })}
-            handleUrl={({ target }) => setNewBlog({ ...newBlog, url: target.value })}
-            handleCreateBlog={handleCreateBlog}
-          />
-          <button onClick={() => setCreateBlogVisible(false)}>cancel</button>
-        </div>
-      </div>
-    )
-  }
+  const createBlogForm = () => (
+    <Togglable buttonLabel="new blog">
+      <CreateBlogForm createBlog={addBlog} />
+    </Togglable>
+  )
 
   if (user === null) {
     return (
       <div>
         <h2>Log in to application</h2>
         <Notification message={notification.message} type={notification.type} />
-        {loginForm()}
+        <LoginForm
+          username={username}
+          password={password}
+          handleUsernameChange={({ target }) => setUsername(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+          handleSubmit={handleLogin}
+        />
       </div>
     )
   }
@@ -143,7 +103,7 @@ const App = () => {
         {user.name} logged in
         <button onClick={() => handleLogoutClick()}>logout</button>
       </div>
-      {createNewForm()}
+      {createBlogForm()}
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
