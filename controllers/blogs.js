@@ -27,6 +27,7 @@ router.post('/', userExtractor, async (request, response) => {
   blog.user = user._id
 
   const createdBlog = await blog.save()
+  // console.log(createdBlog)
 
   user.blogs = user.blogs.concat(createdBlog._id)
   await user.save()

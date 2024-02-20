@@ -1,3 +1,5 @@
+import { describe, test } from '@jest/globals'
+
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
@@ -116,7 +118,7 @@ describe('blogs api', () => {
           url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
         }
 
-        const response = await api
+        await api
           .post('/api/blogs')
           .set('Authorization', authHeader)
           .send(blog)
@@ -130,7 +132,7 @@ describe('blogs api', () => {
           url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
         }
 
-        const response = await api
+        await api
           .post('/api/blogs')
           .set('Authorization', authHeader)
           .send(blog)
@@ -161,7 +163,7 @@ describe('blogs api', () => {
     })
 
     test('can be deleted by the creator', async () => {
-      const blogsBefore = await blogsInDb()
+      await blogsInDb()
 
       await api
         .delete(`/api/blogs/${id}`)
@@ -174,7 +176,7 @@ describe('blogs api', () => {
     })
 
     test('can not be deleted without valid auth header', async () => {
-      const blogsBefore = await blogsInDb()
+      await blogsInDb()
 
       await api
         .delete(`/api/blogs/${id}`)
@@ -193,7 +195,7 @@ describe('blogs api', () => {
         password: 'secret'
       }
 
-      const response = await api
+      await api
         .post('/api/users')
         .send(user)
         .expect(201)
